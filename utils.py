@@ -5,12 +5,9 @@ from geopy.geocoders import Nominatim
 from geopy.distance import geodesic
 
 
-def read_data(file):
-    return pd.read_csv(f'data/{file}')
+df_subway_location = pd.read_csv('data/subway_location.csv')
 
-df_subway_location = read_data('subway_location.csv')
-
-df_district_location = read_data('district_location.csv')
+df_district_location = pd.read_csv('data/district_location.csv')
 
 geolocator = Nominatim(user_agent="my_request")
 
