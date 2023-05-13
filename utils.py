@@ -5,10 +5,8 @@ from geopy.geocoders import Nominatim
 from geopy.distance import geodesic
 
 
-@st.cache_data
 def read_data(file):
     return pd.read_csv(f'data/{file}')
-
 
 df_subway_location = read_data('subway_location.csv')
 
@@ -53,6 +51,7 @@ def get_dist_to_center(location):
         return dist
     else:
         return None
+
 
 def fe(df):
     test = pd.DataFrame(index=[0])
