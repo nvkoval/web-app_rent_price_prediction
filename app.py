@@ -9,9 +9,9 @@ st.set_page_config(
 
 import pandas as pd
 
-from predict_price import get_explain, predict, conf_interval
-from utils import fe
-from model import features
+from src.predict_price import get_explain, predict, conf_interval
+from src.utils import fe
+from src.model import features
 
 
 st.title('Оцінка вартості оренди квартири у Києві')
@@ -27,7 +27,7 @@ def get_data():
 address = st.sidebar.text_input('Адреса')
 
 district = st.sidebar.selectbox(
-    'Район', 
+    'Район',
     options=['Голосіївський', 'Дарницький', 'Деснянський',
              'Дніпровський', 'Оболонський', 'Печерський',
              'Подільський', 'Святошинський', 'Солом\'янський',
@@ -66,7 +66,7 @@ repair_state = st.sidebar.selectbox(
    options=['євроремонт', 'дизайнерський ремонт',
             'незавершений ремонт', 'потрібен ремонт'])
 
-condition = st.sidebar.multiselect(
+condition = st.sidebar.selectbox(
    'загальний стан квартири',
    options=['задовільний стан', 'хороший стан', 'чудовий стан'])
 
@@ -103,24 +103,16 @@ if st.sidebar.button('Оцінити'):
     df = pd.DataFrame(input_data, index=[0])
     X_test = fe(df)
 
-    p_1 = predict(X_test, 'lgb_model.sav')[0]
-    p_2 = predict(X_test, 'xgb_model.sav')[0]
-    p_3 = predict(X_test, 'ctb_model.sav')[0]
-    p_5 = predict(X_test, 'etr_model.sav')[0]
+    cost = predict(X_test, 'lgb_model')[0]
 
-    cost = p_1*0.2 + p_2*0.25 + p_3*0.4 + p_5*0.15
-
-    models = ['lgb_model', 'xgb_model', 'ctb_model', 'etr_model']
-    error = conf_interval(models, X_test)[0]
+    error = conf_interval('lgb_model', X_test)[0]
     st.subheader(f"{int(cost)} грн. ± {int(error)}")
 
     st.text('Що вплинуло на формування ціни:')
 
-    df_formatted, fig = get_explain(X_test, features)
+    df_formatted, fig = get_explain('lgb_model', X_test)
     st.dataframe(df_formatted, width=400)
 
     st.text('')
 
     st.pyplot(fig)
-
-
