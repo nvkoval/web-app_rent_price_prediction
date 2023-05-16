@@ -4,7 +4,6 @@ from eli5 import formatters
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
-from mapie.regression import MapieRegressor
 
 from src.model import X, y
 
@@ -42,12 +41,10 @@ def get_explain(model_name, X_test):
     return df_formatted, fig
 
 
-def conf_interval(model_name, X_test):
+def conf_interval(mapie_reg_name, X_test):
     predictions = pd.DataFrame(index=[0])
-    model = joblib.load(f"data/{model_name}.sav")
 
-    mapie_reg = MapieRegressor(estimator=model, cv=3, agg_function='median')
-    mapie_reg.fit(X, y)
+    mapie_reg = joblib.load(f"data/{mapie_reg_name}.sav")
 
     y_pred_mapie, y_pis = mapie_reg.predict(X_test, ensemble=True, alpha=0.3)
 

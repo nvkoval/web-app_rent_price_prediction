@@ -1,11 +1,11 @@
 import pandas as pd
 import numpy as np
+import lightgbm as lgb
 
 from sklearn.pipeline import Pipeline
 from sklearn.compose import ColumnTransformer
 from sklearn.preprocessing import OrdinalEncoder
-
-import lightgbm as lgb
+from mapie.regression import MapieRegressor
 
 import joblib
 
@@ -39,12 +39,17 @@ parameters_lgb = {
     'objective': 'regression',
 }
 
-model = lgb.LGBMRegressor(**parameters_lgb)
+regr_lgb = lgb.LGBMRegressor(**parameters_lgb)
 
 lgb_model = Pipeline([
     ('transform', transformer),
-    ('regr', model)
+    ('regr', regr_lgb)
 ])
 
 lgb_model.fit(X, y)
 joblib.dump(lgb_model, 'data/lgb_model.sav')
+
+
+mapie_reg_lgb = MapieRegressor(estimator=lgb_model, cv=3, agg_function='median')
+mapie_reg_lgb.fit(X, y)
+joblib.dump(mapie_reg_lgb, 'data/mapie_reg_lgb.sav')

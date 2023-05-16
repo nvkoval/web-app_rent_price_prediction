@@ -7,4 +7,3 @@ lightgbm==3.3.5
 MAPIE==0.6.4
 scikit-learn==1.2.2
 streamlit==1.22.0
-xgboost==1.7.5

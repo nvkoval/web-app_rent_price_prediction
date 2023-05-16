@@ -93,7 +93,7 @@ input_data = {
     'building_details': building_details,
     'features_planning': str([x for x in features_planning]),
     'repair_state': repair_state,
-    'condition': str([x for x in condition]),
+    'condition': condition,
     'facilities': str([x for x in facilities]),
     'subway': subway
 }
@@ -105,7 +105,7 @@ if st.sidebar.button('Оцінити'):
 
     cost = predict(X_test, 'lgb_model')[0]
 
-    error = conf_interval('lgb_model', X_test)[0]
+    error = conf_interval('mapie_reg_lgb', X_test)[0]
     st.subheader(f"{int(cost)} грн. ± {int(error)}")
 
     st.text('Що вплинуло на формування ціни:')
