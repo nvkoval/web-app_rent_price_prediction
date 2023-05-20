@@ -1,5 +1,4 @@
 import streamlit as st
-# from streamlit import components
 
 st.set_page_config(
    page_title="Predict Rent Price",
@@ -11,18 +10,12 @@ import pandas as pd
 
 from src.predict_price import get_explain, predict, conf_interval
 from src.utils import fe
-from src.model import features
-
 
 st.title('Оцінка вартості оренди квартири у Києві')
 
 st.write('---')
 
-st.sidebar.title("Заповність данні по квартирі")
-
-@st.cache(allow_output_mutation=True)
-def get_data():
-    return []
+st.sidebar.title("Заповніть данні по квартирі")
 
 address = st.sidebar.text_input('Адреса')
 
@@ -78,8 +71,6 @@ facilities = st.sidebar.multiselect(
              'душова кабіна', 'джакузі', 'кондиціонер', 'лічильники',
              'камін', 'сейф', 'сигналізація'])
 
-subway = st.sidebar.text_input('Найближча станція метро, наприклад: Печерська')
-
 input_data = {
     'address': address,
     'rooms': rooms,
@@ -94,8 +85,7 @@ input_data = {
     'features_planning': str([x for x in features_planning]),
     'repair_state': repair_state,
     'condition': condition,
-    'facilities': str([x for x in facilities]),
-    'subway': subway
+    'facilities': str([x for x in facilities])
 }
 
 

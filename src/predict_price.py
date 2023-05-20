@@ -5,7 +5,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
 
-from src.model import X, y
+# from src.model import X, y
 
 
 def predict(X_test, model_name: str):

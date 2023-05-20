@@ -8,3 +8,6 @@ env/
 .gitignore
 
 catboost_info/
+
+real_estate_testing.ipynb
+utils_old.py

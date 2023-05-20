@@ -4,7 +4,7 @@ import lightgbm as lgb
 
 from sklearn.pipeline import Pipeline
 from sklearn.compose import ColumnTransformer
-from sklearn.preprocessing import OrdinalEncoder
+from sklearn.preprocessing import OneHotEncoder
 from mapie.regression import MapieRegressor
 
 import joblib
@@ -18,9 +18,9 @@ X = data[features]
 y = np.log1p(data['price']).values
 
 transformer = ColumnTransformer(
-    [('labelEnc', OrdinalEncoder(handle_unknown='use_encoded_value',
-                                 encoded_missing_value=-1,
-                                 unknown_value=-1), ['subway', 'district'])],
+    [('OneHot', OneHotEncoder(sparse_output=False,
+                              handle_unknown='ignore'),
+      ['district', 'subway'])],
     remainder='passthrough',
     verbose_feature_names_out=False
 )
@@ -29,13 +29,13 @@ parameters_lgb = {
     'num_leaves': 3,
     'max_depth': 5,
     'learning_rate': 0.01,
-    'n_estimators': 4925,
+    'n_estimators': 6010,
     'subsample': 0.6,
     'subsample_freq': 1,
     'colsample_bytree': 0.6,
     'random_state': 24,
     'force_col_wise': True,
-    'min_child_samples': 10,
+    'min_child_samples': 8,
     'objective': 'regression',
 }
 
