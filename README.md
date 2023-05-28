@@ -3,4 +3,4 @@
 
 ## Demo App
 
-[![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://nvkoval-ml-course-work-app-6rha68.streamlit.app/)
+[![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://rent-price.streamlit.app/)
