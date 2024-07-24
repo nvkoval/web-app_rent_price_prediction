@@ -124,8 +124,10 @@ def fe(df):
             )
 
     test['lat'], test['lon'] = zip(*df['location'])
-    test['lat'].fillna(test['district_lat'], inplace=True)
-    test['lon'].fillna(test['district_lon'], inplace=True)
+    test['lat'] = test['lat'].fillna(test['district_lat'])
+
+    test['lon'] = test['lon'].fillna(test['district_lon'])
+
     test['subway'], test['min_dist_to_subway'] = zip(*test.apply(get_min_dist_to_subway, axis=1))
     test['dist_to_center'] = test.apply(get_dist_to_center, axis=1)
 
