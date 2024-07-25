@@ -1,9 +1,9 @@
 import joblib
-from matplotlib import colormaps
-from eli5 import formatters
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
+from eli5 import formatters
+from seaborn import diverging_palette
 
 columns_dict = {
     'rooms': 'кількість кімнат',
@@ -73,7 +73,8 @@ columns_dict = {
     'min_dist_to_subway': 'найменша відстань до метро',
     'dist_to_center': 'відстань до центру',
     'dist_to_center|full_area_log': 'відстань до центру | логарифм повної площі',
-    'dist_to_center|full_area_log|kitchen_area': 'відстань до центру | логарифм повної площі | площа кухні',
+    'dist_to_center|full_area_log|kitchen_area':
+    'відстань до центру | логарифм повної площі | площа кухні',
     'full_area|kitchen_area_log': 'загальна площа | логарифм площі кухні'
 }
 
@@ -87,7 +88,8 @@ def predict(X_test, model_name: str):
 
 def get_explain(model_name, X_test):
     model = joblib.load(f"data/{model_name}.sav")
-    cm = colormaps['cividis']
+    cm = diverging_palette(25, 34, as_cmap=True)
+
     test = pd.DataFrame(model[0].transform(X_test),
                         columns=model[0].get_feature_names_out())
     df = formatters.as_dataframe.explain_prediction_df(
@@ -101,14 +103,16 @@ def get_explain(model_name, X_test):
           .loc[1:, ['weight', 'feature']]
           .rename(columns={'weight': 'вплив на ціну',
                            'feature': 'характеристика'}))
+    df['вплив на ціну'] = df['вплив на ціну'].round(-1)
     df_formatted = (df
                     .style.background_gradient(cmap=cm)
-                    .format({'вплив на ціну': '{0:+.2f}'}))
+                    .format({'вплив на ціну': '{0:+.0f}'}))
 
-    fig, ax = plt.subplots(figsize=(10, 6))
+    fig, ax = plt.subplots(figsize=(7, 5))
     plt.yticks(ticks=np.arange(df.shape[0]),
                labels=df['характеристика'], fontsize=10)
-    ax.barh(df['характеристика'], df['вплив на ціну'], color='DarkCyan')
+    colors = np.where(df['вплив на ціну'] >= 0, 'chocolate', 'tan')
+    ax.barh(df['характеристика'], df['вплив на ціну'], color=colors)
 
     return df_formatted, fig
 
