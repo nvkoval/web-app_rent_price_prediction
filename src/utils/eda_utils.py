@@ -9,6 +9,38 @@ from scipy.stats import probplot, f_oneway
 COLOR_PLOT = 'tan'
 COLOR_FONT = 'dimgray'
 
+def plot_histogram(ax, data, title, xlabel, color, is_log=False):
+    # ax.hist(data, bins=50, alpha=0.7, edgecolor='dimgray', color=color)
+    sns.histplot(data, bins=50, alpha=0.7, edgecolor='dimgray', color=color, ax=ax)
+    ax.axvline(data.mean(), color='red', linestyle='-',
+               label=f"Mean: {data.mean():.0f}")
+    ax.axvline(data.median(), color='orange', linestyle='--',
+               label=f"Median: {data.median():.0f}")
+    ax.set_title(title)
+    ax.set_xlabel(xlabel)
+    ax.set_ylabel("Frequency")
+    if not is_log:
+        ax.xaxis.set_major_formatter(ticker.EngFormatter())
+    ax.legend()
+
+def plot_boxplot(ax, data, title, ylabel, color, is_log=False):
+    # ax.boxplot(data, orientation='horizontal',
+    #            patch_artist=True, boxprops={'facecolor': color})
+    sns.boxplot(data, orient='h', color=color, ax=ax)
+    ax.set_title(title)
+    ax.set_ylabel(ylabel)
+    if not is_log:
+        ax.xaxis.set_major_formatter(ticker.EngFormatter())
+
+def plot_probplot(ax, data, title, color, is_log=False):
+    probplot(data, dist="norm", plot=ax)
+    qq_line = ax.get_lines()[0]
+    qq_line.set_markerfacecolor(color)
+    qq_line.set_markeredgecolor(color)
+    ax.set_title(title)
+    if not is_log:
+        ax.yaxis.set_major_formatter(ticker.EngFormatter())
+
 def plot_target_distribution(df, column='price', color=COLOR_PLOT):
     """
     Visualize distribution of the target column
@@ -16,43 +48,74 @@ def plot_target_distribution(df, column='price', color=COLOR_PLOT):
     """
     fig, axes = plt.subplots(2, 2, figsize=(10, 7))
     target = df[column]
+    log_target = np.log1p(target)
 
     # Histogram
-    ax1 = axes[0, 0]
-    ax1.hist(target, bins=50, alpha=0.7, edgecolor='dimgray', color=color)
-    ax1.axvline(target.mean(), color='red', linestyle='-',
-                label=f"Mean: ${target.mean():.0f}")
-    ax1.axvline(target.median(), color='orange', linestyle='--',
-                label=f"Median: ${target.median():.0f}")
-    ax1.set_title("Rent Distribution")
-    ax1.set_xlabel("Monthly Rent ($)")
-    ax1.set_ylabel("Frequency")
-    ax1.xaxis.set_major_formatter(ticker.EngFormatter())
-    ax1.legend()
+    plot_histogram(axes[0, 0], target,
+                   title="Rent Distribution",
+                   xlabel="Monthly Rent ($)",
+                   color=color)
 
     # Boxplot
-    ax2 = axes[0, 1]
-    ax2.boxplot(target, orientation='horizontal')
-    ax2.set_title("Rent Box Plot")
-    ax2.set_ylabel("Monthly Rent ($)")
-    ax2.xaxis.set_major_formatter(ticker.EngFormatter())
+    plot_boxplot(axes[0, 1], target,
+                 title="Rent Box Plot",
+                 ylabel="Monthly Rent ($)",
+                 color=color)
 
     # Log-transformed histogram
-    ax3 = axes[1, 0]
-    log_target = np.log1p(target)
-    ax3.hist(log_target, bins=50, alpha=0.7, edgecolor='dimgray', color=color)
-    ax3.set_title("Log-Transformed Rent Distribution")
-    ax3.set_xlabel("Log(1 + Monthly Rent)")
-    ax3.set_ylabel("Frequency")
+    plot_histogram(axes[1, 0], log_target,
+                   title="Log-Transformed Rent Distribution",
+                   xlabel="Log(1 + Monthly Rent)",
+                   color=color,
+                   is_log=True)
 
     # Q-Q plot for normality
-    ax4 = axes[1, 1]
-    probplot(target, dist="norm", plot=ax4)
-    qq_line = ax4.get_lines()[0]
-    qq_line.set_markerfacecolor(color)
-    qq_line.set_markeredgecolor(color)
-    ax4.yaxis.set_major_formatter(ticker.EngFormatter())
-    ax4.set_title("Q-Q Plot (Normal Distribution)")
+    plot_probplot(axes[1, 1], target,
+                  title="Q-Q Plot (Normal Distribution)",
+                  color=color, is_log=False)
+
+    plt.tight_layout()
+    plt.show()
+
+def plot_target_logtarget_distribution(df, column='price', color=COLOR_PLOT):
+    """
+    Visualize distribution of the target column and its log-transformation.
+    Shows histogram, boxplot, and Q-Q plots.
+    """
+    target = df[column]
+    log_target = np.log1p(target)
+
+    fig, axes = plt.subplots(3, 2, figsize=(10, 10))
+
+    # Histograms
+    plot_histogram(axes[0, 0], target,
+                   title="Rent Distribution",
+                   xlabel="Monthly Rent ($)",
+                   color=color)
+    plot_histogram(axes[0, 1], log_target,
+                   title="Log-Transformed Rent Distribution",
+                   xlabel="Log(1 + Monthly Rent)",
+                   color=color,
+                   is_log=True)
+
+    # Boxplots
+    plot_boxplot(axes[1, 0], target,
+                 title="Rent Box Plot",
+                 ylabel="Monthly Rent ($)",
+                 color=color)
+    plot_boxplot(axes[1, 1], log_target,
+                 title="Log-Transformed Rent Box Plot",
+                 ylabel="Log(1 + Monthly Rent)",
+                 color=color,
+                 is_log=True)
+
+    # Q-Q plots for normality
+    plot_probplot(axes[2, 0], target,
+                  title="Q-Q Plot (Normal Distribution)",
+                  color=color, is_log=False)
+    plot_probplot(axes[2, 1], log_target,
+                  title="Q-Q Plot (Log-Transformed)",
+                  color=color, is_log=True)
 
     plt.tight_layout()
     plt.show()
@@ -140,7 +203,7 @@ def analyze_categorical_feature(df, col):
     print(f"Unique values: {df[col].nunique()}")
     print(f"\nTop 10 values:\n{value_counts.head(10)}")
 
-    rent_stats = (df.groupby(col)['price']
+    rent_stats = (df.groupby(col, observed=True)['price']
                   .agg(['mean', 'median', 'count'])
                   .sort_values('mean', ascending=False)
                   .round(2))
@@ -169,8 +232,6 @@ def plot_categorical_distribution(df, col):
     ax1.bar(top_10.index, top_10.values, color=COLOR_PLOT)
     ax1.set_title(f"Frequency Distribution")
     ax1.set_ylabel("Count")
-    # ax1.set_xticks(range(len(top_10)))
-    # ax1.set_xticklabels(top_10.index, rotation=60, ha='right')
     ax1.tick_params(axis='x', rotation=60)
 
     # Boxplot
