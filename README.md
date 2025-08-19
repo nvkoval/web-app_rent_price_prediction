@@ -8,7 +8,23 @@
 
 ## Project Description
 
-This project provides a machine learning-powered web application to predict rental prices for apartments in Kyiv. The app uses a LightGBM regression model with conformal prediction intervals (via MAPIE) and a user-friendly Streamlit interface.
+This project provides a machine learning-powered web application to predict rental prices for apartments in Kyiv. The app is built with **Streamlit** and powered by a **LightGBM regression model** enhanced with **conformal prediction intervals (MAPIE)**.
+
+
+Users can input apartment details such as:
+- Address, district
+- Number of rooms and total area
+- Floor and building type
+- Amenities in apartment
+
+and get an estimated rental price with confidence intervals.
+
+## Demo
+
+The project includes a Streamlit web app for interactive rental price prediction.
+
+### Screenshot
+![Streamlit rental price prediction app UI](images/app_screenshot.jpg)
 
 ### Features
 
@@ -48,17 +64,29 @@ This project provides a machine learning-powered web application to predict rent
 
 ```
 .
-├── app.py                  # Streamlit app entry point
+├── app.py                          # Streamlit app entry point
 ├── src/
-│   ├── model.py            # Model training and saving
-│   ├── predict_price.py    # Prediction and explanation logic
-│   └── utils.py            # Feature engineering utilities
+│   ├── inference                   # Inference and production logic
+│   │   ├── model.py                # Model training and saving
+│   │   ├── predict_price.py        # Prediction and explanation logic
+│   │   └── preprocessing.py        # Feature preprocessing utilities
+│   ├── models                      # Modeling utilities
+│   │   ├── model_evaluation.py     # Cross-validation and metrics
+│   │   └── pipeline_utils.py       # Pipeline builders
+│   ├── utils                       # General utilities
+│   │   └── eda_utils.py            # Functions for exploratory data analysis
 ├── data/
-│   ├── real_estate_last.csv
-│   ├── lgb_model.sav
-│   ├── mapie_reg_lgb.sav
-│   └── ... (other data and models)
-├── noteboks/               # Jupyter notebooks for EDA and feature engineering
+│   ├── external                    # External reference data
+│   │   ├── district_location.csv   # District geodata
+│   │   └── subway_location.csv     # Subway geodata
+│   ├── real_estate_last.csv        # Latest cleaned dataset
+│   ├── lgb_model.sav               # Trained LightGBM model
+│   ├── mapie_reg_lgb.sav           # Model with uncertainty estimation
+├── images/                         # App screenshots
+│   └── demo_screenshot.jpg
+├── styles/                         # Custom styles for matplotlib/seaborn
+│   └── presentation.mplstyle
+├── notebooks/                      # Jupyter notebooks for EDA, experiments and feature engineering
 ├── requirements.txt
 └── README.md
 ```
